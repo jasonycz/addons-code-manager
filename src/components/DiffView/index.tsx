@@ -7,13 +7,17 @@ import {
   Hunk,
   HunkInfo,
   parseDiff,
+  tokenize,
 } from 'react-diff-view';
 
+import refractor from '../../refractor';
+import { getLanguageFromMimeType } from '../../utils';
 import styles from './styles.module.scss';
 import 'react-diff-view/style/index.css';
 
 type Props = {
   diff: string;
+  mimeType: string;
   viewType: DiffProps['viewType'];
 };
 
@@ -70,8 +74,14 @@ class DiffView extends React.Component<Props> {
   };
 
   render() {
-    const { diff, viewType } = this.props;
+    const { diff, mimeType, viewType } = this.props;
+
     const files = parseDiff(diff);
+    const options = {
+      highlight: true,
+      language: getLanguageFromMimeType(mimeType),
+      refractor,
+    };
 
     return (
       <div className={styles.DiffView}>
@@ -86,6 +96,7 @@ class DiffView extends React.Component<Props> {
                 className={styles.diff}
                 diffType={type}
                 hunks={hunks}
+                tokens={tokenize(hunks, options)}
                 viewType={viewType}
               >
                 {/* Don't ask... https://github.com/otakustay/react-diff-view/blob/882f85adc46431f065a3458104e13f6233cdfcfd/src/Diff/__test__/Diff.test.jsx#L18 */}

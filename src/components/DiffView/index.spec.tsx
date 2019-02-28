@@ -11,7 +11,9 @@ import DiffView from '.';
 
 describe(__filename, () => {
   const render = (props = {}) => {
-    return shallow(<DiffView diff={basicDiff} {...props} />);
+    return shallow(
+      <DiffView diff={basicDiff} mimeType="text/plain" {...props} />,
+    );
   };
 
   it('defaults the viewType to unified', () => {
@@ -29,7 +31,7 @@ describe(__filename, () => {
 
   it('passes parsed diff information to DiffView', () => {
     const parsedDiff = parseDiff(basicDiff)[0];
-    const root = shallow(<DiffView diff={basicDiff} />);
+    const root = render({ diff: parsedDiff });
 
     expect(root.find(Diff)).toHaveProp('diffType', parsedDiff.type);
     expect(root.find(Diff)).toHaveProp('hunks', parsedDiff.hunks);
@@ -37,7 +39,7 @@ describe(__filename, () => {
 
   it('creates multiple Diff instances when there are multiple files in the diff', () => {
     const parsedDiff = parseDiff(multipleDiff);
-    const root = shallow(<DiffView diff={multipleDiff} />);
+    const root = render({ diff: parsedDiff });
 
     expect(root.find(Diff)).toHaveLength(parsedDiff.length);
     parsedDiff.forEach((diff, index) => {
@@ -57,7 +59,7 @@ describe(__filename, () => {
   it('renders hunks with separators', () => {
     const parsedDiff = parseDiff(diffWithDeletions)[0];
 
-    const root = shallow(<DiffView diff={diffWithDeletions} />);
+    const root = render({ diff: parsedDiff });
     const diff = root.find(Diff).shallow();
 
     expect(diff.find(`.${styles.hunk}`)).toHaveLength(parsedDiff.hunks.length);
